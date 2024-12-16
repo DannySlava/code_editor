@@ -1,0 +1,182 @@
+<!-- editor/templates/editor/index.html -->
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditeur de Code</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+        
+        .left-panel, .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #1e1e1e;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .left-panel:hover, .right-panel:hover {
+            transform: scale(1.02);
+        }
+        
+        .editor-container {
+            flex: 2;
+            border: 1px solid #444;
+            border-radius: 10px;
+            background: #2a2a2a;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .terminal, .errors, .improvements {
+            flex: 1;
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            overflow-y: auto;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        select, button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: rgb(46, 168, 83);
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        
+        button:hover {
+            background: rgb(97, 209, 45);
+            transform: translateY(-2px);
+        }
+        
+        .CodeMirror {
+            height: 100%;
+            font-size: 14px;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .section-title {
+            margin: 0 0 10px 0;
+            color: #bbb;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgb(46, 168, 83);
+            padding-bottom: 5px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <select id="language">
+            {% comment %} <option value="c">C</option> {% endcomment %}
+            <option value="java">Java</option>
+            {% comment %} <option value="python">Python</option> {% endcomment %}
+        </select>
+        <button id="runBtn">Exécuter</button>
+    </div>
+    
+    <div class="container">
+        <div class="left-panel">
+            <div class="editor-container">
+                <textarea id="code"></textarea>
+            </div>
+            <div class="terminal">
+                <div class="section-title">Terminal</div>
+                <div id="output"></div>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div class="errors">
+                <div class="section-title">Erreurs et Suggestions</div>
+                <div id="errors"></div>
+            </div>
+            <div class="improvements">
+                <div class="section-title">Améliorations Proposées</div>
+                <div id="improvements"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+    <script>
+        let editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+            lineNumbers: true,
+            theme: "monokai",
+            mode: "text/x-csrc",
+            indentUnit: 4,
+            autoCloseBrackets: true,
+            matchBrackets: true
+        });
+
+        document.getElementById('language').addEventListener('change', function(e) {
+            let mode = e.target.value === 'c' ? 'text/x-csrc' : 'text/x-java';
+            editor.setOption('mode', mode);
+        });
+
+        document.getElementById('runBtn').addEventListener('click', function() {
+            const code = editor.getValue();
+            const language = document.getElementById('language').value;
+            
+            document.getElementById('output').textContent = 'Exécution en cours...';
+            document.getElementById('errors').textContent = '';
+            document.getElementById('improvements').textContent = '';
+
+            fetch('/execute/', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'code': code,
+                    'language': language
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('output').textContent = data.output || 'Pas de sortie';
+                document.getElementById('errors').innerHTML = data.errors ? 
+                    `Erreurs:<br>${data.errors}<br><br>Suggestions:<br>${data.suggestions}` : 
+                    'Aucune erreur';
+                document.getElementById('improvements').innerHTML = data.improvements || 'Pas de suggestions';
+            })
+            .catch(error => {
+                document.getElementById('output').textContent = 'Erreur lors de l\'exécution';
+                document.getElementById('errors').textContent = error.toString();
+            });
+        });
+    </script>
+</body>
+</html>
