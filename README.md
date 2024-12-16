@@ -8,4 +8,4 @@ Installez également les modules suivant :
 - django
 - google.generativeai
 
-Vous devez aussi disposer d'une clé d'API pour utiliser Gemimi.
+Vous devez aussi disposer d'une clé d'API pour utiliser Gemini.
