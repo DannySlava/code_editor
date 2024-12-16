@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 import tempfile
 
 # Configuration de l'API Gemini
-genai.configure(api_key='AIzaSyDrczwEYVVy61rpwG_WjoSArclVWuAShhQ')
+genai.configure(api_key='')
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 def index(request):
