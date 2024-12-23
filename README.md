@@ -11,6 +11,6 @@ Installez également les modules suivant :
 - django
 - google.generativeai
 
-Vous devez aussi disposer d'une clé d'API pour utiliser Gemini.
+Vous devez aussi disposer d'une clé d'API pour utiliser Gemini pour le débogage en temps réel et les suggestions d'amélioration de code.
 
 Accéder à code_editor/manage.py et lancez 'runserver' pour utiliser notre éditeur.
