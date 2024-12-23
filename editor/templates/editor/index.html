@@ -1,139 +1,270 @@
-<!-- editor/templates/editor/index.html -->
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éditeur de Code</title>
+    <title>Code Editor BackAntimo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #2EA853;
+            --primary-hover: #61D12D;
+            --bg-dark: #121212;
+            --bg-darker: #0A0A0A;
+            --bg-panel: #1E1E1E;
+            --text-primary: #E0E0E0;
+            --text-secondary: #BBB;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
-            color: #e0e0e0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
             line-height: 1.6;
+            min-height: 100vh;
         }
-        
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            height: calc(100vh - 40px);
-        }
-        
-        .left-panel, .right-panel {
+
+        .header {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            background: #1e1e1e;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--bg-panel);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
-        
-        .left-panel:hover, .right-panel:hover {
-            transform: scale(1.02);
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
         }
-        
-        .editor-container {
-            flex: 2;
-            border: 1px solid #444;
-            border-radius: 10px;
-            background: #2a2a2a;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+
+        .logo i {
+            font-size: 2rem;
         }
-        
-        .terminal, .errors, .improvements {
-            flex: 1;
-            background: #222;
-            padding: 20px;
-            border-radius: 10px;
-            font-family: monospace;
-            overflow-y: auto;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7);
-        }
-        
+
         .controls {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 1rem;
+            align-items: center;
         }
-        
-        select, button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background: rgb(46, 168, 83);
-            color: #fff;
+
+        select {
+            padding: 0.8rem 1.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            background: transparent;
+            color: var(--text-primary);
             cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232EA853%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem top 50%;
+            background-size: 0.8rem auto;
+            padding-right: 2.5rem;
         }
-        
+
+        select:hover {
+            border-color: var(--primary-hover);
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         button:hover {
-            background: rgb(97, 209, 45);
+            background: var(--primary-hover);
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(46, 168, 83, 0.3);
         }
-        
+
+        .container {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            height: calc(100vh - 140px);
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .editor-container {
+            flex: 2;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+        }
+
         .CodeMirror {
-            height: 100%;
-            font-size: 14px;
-            background: #2a2a2a;
-            color: #e0e0e0;
-            border-radius: 8px;
+            height: 100% !important;
+            font-family: 'Fira Code', monospace;
+            font-size: 15px;
+            padding: 1rem;
+            border-radius: var(--border-radius);
         }
-        
+
+        .output-section {
+            flex: 1;
+            background: var(--bg-darker);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
         .section-title {
-            margin: 0 0 10px 0;
-            color: #bbb;
-            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid rgb(46, 168, 83);
-            padding-bottom: 5px;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
         }
-        
+
+        .output-content {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            position: relative;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .loading:after {
+            content: '';
+            display: block;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            border-color: var(--primary-color) transparent var(--primary-color) transparent;
+            animation: loading 1.2s linear infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div class="controls">
-        <select id="language">
-            {% comment %} <option value="c">C</option> {% endcomment %}
-            <option value="java">Java</option>
-            {% comment %} <option value="python">Python</option> {% endcomment %}
-        </select>
-        <button id="runBtn">Exécuter</button>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-code"></i>
+            <span>Code Editor BackAntimo</span>
+        </div>
+        <div class="controls">
+            <select id="language">
+                <option value="c">C</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+            </select>
+            <button id="runBtn">
+                <i class="fas fa-play"></i>
+                Exécuter
+            </button>
+        </div>
     </div>
     
     <div class="container">
-        <div class="left-panel">
+        <div class="panel">
             <div class="editor-container">
                 <textarea id="code"></textarea>
             </div>
-            <div class="terminal">
-                <div class="section-title">Terminal</div>
-                <div id="output"></div>
+            <div class="output-section">
+                <div class="section-title">
+                    <i class="fas fa-terminal"></i>
+                    Terminal
+                </div>
+                <div id="output" class="output-content"></div>
             </div>
         </div>
         
-        <div class="right-panel">
-            <div class="errors">
-                <div class="section-title">Erreurs et Suggestions</div>
-                <div id="errors"></div>
+        <div class="panel">
+            <div class="output-section">
+                <div class="section-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Erreurs et Suggestions
+                </div>
+                <div id="errors" class="output-content"></div>
             </div>
-            <div class="improvements">
-                <div class="section-title">Améliorations Proposées</div>
-                <div id="improvements"></div>
+            <div class="output-section">
+                <div class="section-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Améliorations Proposées
+                </div>
+                <div id="improvements" class="output-content"></div>
             </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script>
         let editor = CodeMirror.fromTextArea(document.getElementById("code"), {
             lineNumbers: true,
@@ -141,17 +272,47 @@
             mode: "text/x-csrc",
             indentUnit: 4,
             autoCloseBrackets: true,
-            matchBrackets: true
+            matchBrackets: true,
+            lineWrapping: true,
+            tabSize: 4,
+            styleActiveLine: true,
+            extraKeys: {
+                "Ctrl-Enter": function(cm) {
+                    document.getElementById('runBtn').click();
+                }
+            }
         });
 
+        // Ajout d'un exemple de code par défaut
+        editor.setValue('// Écrivez votre code ici\n');
+        
         document.getElementById('language').addEventListener('change', function(e) {
-            let mode = e.target.value === 'c' ? 'text/x-csrc' : 'text/x-java';
+            let mode = 'text/x-csrc';
+            let defaultCode = '// Écrivez votre code ici\n';
+            
+            if (e.target.value === 'java') {
+                mode = 'text/x-java';
+                defaultCode = 'public class Main {\n    public static void main(String[] args) {\n        // Écrivez votre code ici\n    }\n}';
+            } else if (e.target.value === 'python') {
+                mode = 'text/x-python';
+                defaultCode = '# Écrivez votre code ici\n';
+            }
+            
             editor.setOption('mode', mode);
+            if (editor.getValue().trim() === '') {
+                editor.setValue(defaultCode);
+            }
         });
 
         document.getElementById('runBtn').addEventListener('click', function() {
+            const button = this;
+            const originalContent = button.innerHTML;
             const code = editor.getValue();
             const language = document.getElementById('language').value;
+            
+            // Animation de chargement
+            button.innerHTML = '<div class="loading"></div> Exécution...';
+            button.disabled = true;
             
             document.getElementById('output').textContent = 'Exécution en cours...';
             document.getElementById('errors').textContent = '';
@@ -175,7 +336,18 @@
             .catch(error => {
                 document.getElementById('output').textContent = 'Erreur lors de l\'exécution';
                 document.getElementById('errors').textContent = error.toString();
+            })
+            .finally(() => {
+                button.innerHTML = originalContent;
+                button.disabled = false;
             });
+        });
+
+        // Raccourci clavier Ctrl+Enter
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                document.getElementById('runBtn').click();
+            }
         });
     </script>
 </body>
