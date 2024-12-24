@@ -14,3 +14,5 @@ Installez également les modules suivant :
 Vous devez aussi disposer d'une clé d'API pour utiliser Gemini pour le débogage en temps réel et les suggestions d'amélioration de code.
 
 Accéder à code_editor/manage.py et lancez 'runserver' pour utiliser notre éditeur.
+
+127.0.0.1:8000
