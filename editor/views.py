@@ -201,4 +201,4 @@ def get_code_improvements(code, language):
         return response.text
     except Exception as e:
         logger.error(f"Error getting code improvements: {str(e)}")
-        return "Erreur lors de l'analyse des améliorations"
+        return "Erreur lors de l'analyse des améliorations. Vérifiez votre connexion Internet et assurez-vous d'avoir une clé d'API"
